@@ -1,3 +1,4 @@
+
 module ne (
     CLR,
     T3,
@@ -51,29 +52,50 @@ module ne (
     if (CLR == 0) begin
       // TODO:复原信号 
       STO  <= 0;
+      S[0] <= 1;
+      S[1] <= 1;
+
       SSTO <= 0;
       LONG <= 0;  //不使用long
     end else begin  //下面说明T3触发
+      S[3] = W2;
+      S[2] = W1;
       if ((~W1) & (~W2) & (~W3)) begin  //实际上就是W1,但是会慢一拍
         SWA <= RSWA;
         SWB <= RSWB;
         SWC <= RSWC;
-      end else if ((~STO) & (~SWA) & (~SWB) & (~SWC) & W2) begin
+      end
+      if ((~STO) & (~SWA) & (~SWB) & (~SWC) & W2) begin
         SSTO <= 1;
-      end else if (SSTO & (~SWA) & (~SWB) & (~SWC) & W1) begin
-        STO <= 1;
-      end else if (SWC & (~SWB) & (~SWC) & W1 & (~STO) & (~SSTO)) begin //慢一拍,实际上是第一次W2
+        S[1] <= 0;
+      end
+      if (SSTO & (~SWA) & (~SWB) & (~SWC) & W1) begin
+        STO  <= 1;
+        S[0] <= 0;
+      end
+      if (SWC & (~SWB) & (~SWC) & W1 & (S[0]) & (S[1])) begin  //慢一拍,实际上是第一次W2
         SSTO <= 1;
-      end else if ((~SWA) & SWB & (~SWC) & (~W1) & (~W2) & (~W3) & (~STO) & (~SSTO)) begin //慢一拍,实际上是第一次W1
+        S[1] <= 0;
+      end
+      if ((~SWA) & SWB & (~SWC) & (~W1) & (~W2) & (~W3) & (S[0]) & (S[1])) begin //慢一拍,实际上是第一次W1
         SSTO <= 1;
-      end else if (SWA & (~SWB) & (~SWC) & W1 & & (~W2) & (~W3) & (~STO) & (~SSTO)) begin //慢一拍,实际上是第一次W1
+        S[1] <= 0;
+      end
+      if (SWA & (~SWB) & (~SWC) & W1 & & (~W2) & (~W3) & (S[0]) & (S[1])) begin //慢一拍,实际上是第一次W1
         SSTO <= 1;
-      end else if (SWC & (~SWB) & (~SWC) & W2 & (~STO) & SSTO) begin //慢一拍,实际上是第二次W2
-        STO <= 1;
-      end else if ((~SWA) & SWB & (~SWC) & W1 & (~STO) & SSTO) begin //慢一拍,实际上是第二次W1
-        STO <= 1;
-      end else if (SWA & (~SWB) & (~SWC) & W1 & (~STO) & SSTO) begin //慢一拍,实际上是第二次W1
-        STO <= 1;
+        S[1] <= 0;
+      end
+      if (SWC & (~SWB) & (~SWC) & W2 & (S[0]) & ~S[1]) begin  //慢一拍,实际上是第二次W2
+        STO  <= 1;
+        S[0] <= 0;
+      end
+      if ((~SWA) & SWB & (~SWC) & W1 & (S[0]) & ~S[1]) begin  //慢一拍,实际上是第二次W1
+        STO  <= 1;
+        S[0] <= 0;
+      end
+      if (SWA & (~SWB) & (~SWC) & W1 & (S[0]) & ~S[1]) begin  //慢一拍,实际上是第二次W1
+        STO  <= 1;
+        S[0] <= 0;
       end
     end
   end
@@ -204,22 +226,22 @@ module ne (
 
     MEMW <= ((~SWC) & (~SWB) & SWA & STO & W1) | ((~SWC) & (~SWB) & (~SWA) & ST & W2);
 
-    S[3] <= ((~ SWC) & (~ SWB) & (~ SWA)) & 
-			((W1 & (ADD | SIGAND | SIGOR | LD | ST | SET | JMP | SIGOUT)) | 
-			 (ST & W2)
-			 );
+    //  S[3] <= ((~ SWC) & (~ SWB) & (~ SWA)) & 
+    //		((W1 & (ADD | SIGAND | SIGOR | LD | ST | SET | JMP | SIGOUT)) | 
+    //		 (ST & W2)
+    //		 );
 
 
-    S[2] <= ((~SWC) & (~SWB) & (~SWA) & W1) & (SUB | SIGOR | SIGXOR | ST | SET | JMP | CMP);
+    //  S[2] <= ((~SWC) & (~SWB) & (~SWA) & W1) & (SUB | SIGOR | SIGXOR | ST | SET | JMP | CMP);
 
 
-    S[1] <= ((~ SWC) & (~ SWB) & (~ SWA)) & 
-			((W1 & (SUB | SIGAND | SIGOR | SIGXOR | 
-			  LD | ST | JMP | SIGOUT | CMP)) | 
-			  (ST & W2)
-			 );
+    //  S[1] <= ((~ SWC) & (~ SWB) & (~ SWA)) & 
+    //		((W1 & (SUB | SIGAND | SIGOR | SIGXOR | 
+    //		  LD | ST | JMP | SIGOUT | CMP)) | 
+    //		  (ST & W2)
+    //		 );
 
-    S[0] <= (~SWC) & (~SWB) & (~SWA) & (ADD | SIGAND | ST | JMP) & W1;
+    //   S[0] <= (~SWC) & (~SWB) & (~SWA) & (ADD | SIGAND | ST | JMP) & W1;
 
 
     SEL[3] <= ((SWC & (~SWB) & (~SWA) & STO) & (W1 | W2)) | ((~SWC) & SWB & SWA & W2);
