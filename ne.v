@@ -146,8 +146,8 @@ module ne (
     LIR <= ((~ SWC) & (~ SWB) & (~ SWA)) & 
 		   ((W2 & (~ STO)) |
 			((ADD | SUB | SIGAND | SIGOR | SIGXOR | 
-			 NOP | INC | SIGOUT | CMP) & W1) |
-			 ((LD | ST | JMP) & W2) |
+			 NOP | INC | SIGOUT | CMP | JMP) & W1) |
+			 ((LD | ST) & W2) |
 			 (JC & C & W2) |
 			 (JZ & Z & W2) |
 			 (JC & (~ C) & W1) |
@@ -182,8 +182,8 @@ module ne (
 
     PCINC <= ((~ SWC) & (~ SWB) & (~ SWA)) & 
 		     ((W2 & (~ STO)) |
-			  ((ADD | SUB | SIGAND | SIGOR | SIGXOR |NOP | INC | SIGOUT | CMP) & W1) |
-			   ((LD | ST | JMP) & W2) |
+			  ((ADD | SUB | SIGAND | SIGOR | SIGXOR |NOP | INC | SIGOUT | CMP | JMP) & W1) |
+			   ((LD | ST ) & W2) |
 			   (JC & C & W2) |
 			   (JZ & Z & W2) |
 			   (JC & (~ C) & W1) |
