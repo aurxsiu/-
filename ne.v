@@ -165,7 +165,7 @@ module ne (
 		      (LD & W2)));
 
     M <= (~ SWC) & (~ SWB) & (~ SWA) & 
-		 (((SIGAND | SIGOR | 9  | LD | ST | JMP | SIGOUT) & W1) | (ST & W2));
+		 (((SIGAND | SIGOR | SIGXOR  | LD | ST | JMP | SIGOUT) & W1) | (ST & W2));
 
     ABUS <= (~ SWC) & (~ SWB) & (~ SWA) & 
 			(((ADD | SUB | SIGAND | SIGOR | SIGXOR | LD | 
@@ -182,7 +182,7 @@ module ne (
 
     PCINC <= ((~ SWC) & (~ SWB) & (~ SWA)) & 
 		     ((W2 & (~ STO)) |
-			  ((ADD | SUB | SIGAND | SIGOR | SIGXOR | INC | SIGOUT | CMP) & W1) |
+			  ((ADD | SUB | SIGAND | SIGOR | SIGXOR |NOP | INC | SIGOUT | CMP) & W1) |
 			   ((LD | ST | JMP) & W2) |
 			   (JC & C & W2) |
 			   (JZ & Z & W2) |
